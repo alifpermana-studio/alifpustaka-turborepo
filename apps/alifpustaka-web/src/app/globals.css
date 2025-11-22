@@ -1,0 +1,77 @@
+@import 'tailwindcss';
+@import '../styles/keyframes.css';
+@import '../styles/header.css';
+@import '../styles/home-hero.css';
+@import '../styles/home-stats.css';
+@import '../styles/home-introduction.css';
+@import '../styles/home-payment-preview.css';
+@plugin "daisyui" {
+  themes:
+    emerald --default,
+    synthwave --prefersdark;
+}
+
+/* src/styles/globals.css */
+
+/* Add this at the top of your file, after @tailwind directives */
+/* This redefines the 'dark' variant to only apply if an ancestor has the '.dark' class. */
+/* If no ancestor has '.dark' class (and you're not manually adding it), then dark: styles won't activate. */
+@custom-variant dark (&:where([data-theme=synthwave], [data-theme=synthwave] *));
+@custom-variant light (&:where([data-theme=emerald], [data-theme=emerald] *));
+
+@theme {
+  --color-primary-dark: #0066cc;
+  --color-primary-light: #66b2ff;
+
+  --color-secondary-dark: #00bcd4;
+  --color-secondary-light: #80deea;
+
+  --color-background-dark: #001531;
+  --color-background-light: #ededed;
+
+  --color-medium-gradient-dark: #0a2b5b;
+  --color-light-gradient-dark: #2e6c9d;
+
+  --color-medium-gradient-light: #c0c0c0;
+  --color-light-gradient-light: #d3d3d3;
+
+  --color-surface-dark: #00204b;
+  --color-surface-light: #ffffff;
+
+  --color-text-dark: #e5e7eb;
+  --color-text-light: #1f2937;
+
+  --color-muted-dark: #94a3b8;
+  --color-muted-light: #6b7280;
+
+  --color-accent-dark: #ff9500;
+  --color-accent-light: #ffa733;
+
+  --color-success: #00ea0d;
+  --color-error: #ea0d00;
+  --color-warning: #ffff00;
+
+  --font-family: Quicksand, Helvetica, sans-serif;
+
+  --animate-hide-dropdown: hide-dropdown-sequence 1s ease-in-out forwards;
+
+  --animate-show-dropdown: show-dropdown-sequence 1s ease-in-out forwards;
+
+  --animate-hamburger-to-cross: hamburger-to-cross-sequence 1s ease-in-out forwards;
+
+  --animate-cross-to-humberger: cross-to-humberger-sequence 1s ease-in-out forwards;
+}
+
+@layer base {
+  body {
+    @apply bg-base-100 font-sans text-base-content;
+  }
+}
+
+.default-layout {
+  @apply relative h-screen w-full flex-col overflow-x-hidden overflow-y-auto bg-base-100 px-2 text-base-content;
+}
+
+.mobile-dropdown-scroll {
+  -webkit-overflow-scrolling: touch;
+}

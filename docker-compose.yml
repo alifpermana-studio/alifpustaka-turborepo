@@ -1,0 +1,121 @@
+version: "3.8"
+
+services:
+  nginx:
+    image: nginx:1.25.2
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d:/etc/nginx/conf.d/:ro
+      - ./certbot/www:/var/www/certbot/:ro
+      - ./certbot/conf:/etc/letsencrypt
+    depends_on:
+      - alifpustaka-app
+      - alifpustaka-web
+    networks:
+      - alifpustaka-net
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./certbot/www:/var/www/certbot:rw
+      - ./certbot/conf:/etc/letsencrypt:rw
+    networks:
+      - alifpustaka-net
+
+  # --- MIGRATION SERVICE (NEW) ---
+  alifpustaka-migrate:
+    # Build using the app's Dockerfile (which has access to the Prisma config)
+    build:
+      context: .
+      dockerfile: ./apps/alifpustaka-app/Dockerfile # Use the backend app's Dockerfile
+    container_name: alifpustaka-migrate
+    environment:
+      - NODE_ENV=production
+    # 🚨 Crucial: Uses the same environment variables as your apps/packages
+    env_file:
+      - ./apps/alifpustaka-app/.env.production
+    networks:
+      - alifpustaka-net
+    depends_on:
+      postgres-db:
+        condition: service_healthy # Wait for the database to be ready (requires healthcheck on DB)
+
+    # 🚨 The primary command: Run the deployment migration
+    # This command uses the Prisma Client defined in your shared package.
+    # Note: The command needs to be relative to the container's /app directory.
+    command: pnpm --filter alifpustaka-app prisma migrate deploy
+    # Use "pnpm --filter alifpustaka-app" to ensure pnpm is available and points to the correct package.
+
+  # --- Application (Backend/API) Service ---
+  alifpustaka-app:
+    # 🚨 KEY CHANGE 1: Context is the root of the monorepo
+    build:
+      context: .
+      # 🚨 KEY CHANGE 2: Path to the app's Dockerfile within the monorepo
+      dockerfile: ./apps/alifpustaka-app/Dockerfile
+    image: alifpustaka-app:latest
+    container_name: alifpustaka-app
+    environment:
+      - NODE_ENV=production
+    # 🚨 KEY CHANGE 3: Update env_file path if you keep it separate
+    env_file:
+      - ./apps/alifpustaka-app/.env.production
+    expose:
+      - "3000"
+    # 🚨 CRUCIAL DEPENDENCY: The app MUST wait for the migrations to complete
+    depends_on:
+      - postgres-db
+      - alifpustaka-migrate # Ensure migrations finish before the app starts
+    networks:
+      - alifpustaka-net
+
+  # --- Web (Frontend) Service ---
+  alifpustaka-web:
+    # 🚨 KEY CHANGE 1: Context is the root of the monorepo
+    build:
+      context: .
+      # 🚨 KEY CHANGE 2: Path to the web's Dockerfile within the monorepo
+      dockerfile: ./apps/alifpustaka-web/Dockerfile
+    image: alifpustaka-web:latest
+    container_name: alifpustaka-web
+    environment:
+      - NODE_ENV=production
+    # 🚨 KEY CHANGE 3: Update env_file path
+    env_file:
+      - ./apps/alifpustaka-web/.env.production
+    expose:
+      - "4000"
+    depends_on:
+      - postgres-db
+      - alifpustaka-migrate # Ensure migrations finish before the web app's backend starts
+    networks:
+      - alifpustaka-net
+
+  # --- Database Service ---
+  postgres-db:
+    image: postgres:latest
+    restart: always
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: apus_admin
+      POSTGRES_PASSWORD: ${DB_PASSWORD} # Use a variable for secrets!
+      POSTGRES_DB: users
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - alifpustaka-net
+
+volumes:
+  postgres-data:
+
+networks:
+  alifpustaka-net:
+    driver: bridge

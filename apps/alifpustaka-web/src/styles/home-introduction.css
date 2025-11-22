@@ -1,0 +1,80 @@
+/* .gradient-background-introduction {
+  @apply rounded-full bg-radial-[at_55%_55%] from-medium-gradient-light/40 via-light-gradient-light/50 to-background-light/20 to-90% dark:from-accent-dark/30 dark:via-accent-dark/0 dark:to-accent-dark/0;
+} */
+
+/* .fade-container {
+  display: inline-block;
+  transition:
+    opacity 0.5s ease-out,
+    max-height 0.5s ease-out;
+  overflow: hidden; 
+  max-height: 500px; 
+  opacity: 1;
+} 
+
+.fade-out {
+  opacity: 0;
+  max-height: 0;
+  margin-top: 0; 
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  
+  pointer-events: none;
+}
+
+.fade-in {
+  opacity: 1;
+  max-height: 500px; 
+} */
+
+/* .fade-container {
+  transform-origin: top;
+  transition:
+    transform 0.3s ease-out,
+    opacity 0.3s ease-out;
+}
+
+.fade-in {
+  transform: scaleY(1);
+  opacity: 1;
+}
+
+.fade-out {
+  transform: scaleY(0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hidden-initial {
+  opacity: 0;
+  max-height: 0;
+  pointer-events: none;
+} */
+
+/* styles/glow-background.css */
+.glow-background {
+  background:
+    radial-gradient(circle at 50% 40%, var(--color-accent) -100%, transparent 35%),
+    radial-gradient(circle at 50% 80%, var(--color-info) -200%, transparent 30%);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* Example: On small screens (<= 640px) */
+@media (max-width: 640px) {
+  .glow-background {
+    background:
+      radial-gradient(circle at 50% 40%, var(--color-accent) -100%, transparent 35%),
+      radial-gradient(circle at 50% 80%, var(--color-info) -200%, transparent 30%);
+  }
+}
+
+/* Example: On large screens (>= 1024px) */
+@media (min-width: 1024px) {
+  .glow-background {
+    background:
+      radial-gradient(circle at 25% 50%, var(--color-accent) -100%, transparent 30%),
+      radial-gradient(circle at 75% 50%, var(--color-info) -200%, transparent 25%);
+  }
+}

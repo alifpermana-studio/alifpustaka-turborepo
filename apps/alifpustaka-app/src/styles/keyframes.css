@@ -1,0 +1,45 @@
+@keyframes show-dropdown-sequence {
+  0% {
+    transform: translateY(0px) scale(90%);
+    opacity: 0;
+    visibility: hidden;
+  }
+  100% {
+    transform: translateY(65px) scale(100%);
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+@keyframes hide-dropdown-sequence {
+  0% {
+    transform: translateY(65px) scale(100%); /* Start from shown position */
+    opacity: 1;
+    visibility: visible;
+  }
+  50% {
+    transform: translateY(84px) scale(100%); /* Go down first */
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    transform: translateY(0px) scale(90%); /* Then hide up */
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes pulsebar-sequence {
+  0% {
+    opacity: 1;
+    transform: 'translateX(0%)';
+  }
+  50% {
+    opacity: 0.5;
+    transform: 'translateX(20%)';
+  }
+  100% {
+    opacity: 1;
+    transform: 'translateX(0%)';
+  }
+}

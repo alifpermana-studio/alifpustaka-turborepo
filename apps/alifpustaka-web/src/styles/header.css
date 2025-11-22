@@ -1,0 +1,146 @@
+/* .header {
+  @apply ;
+} */
+
+/* .nav-container {
+  @apply ;
+} */
+
+/* .nav-gradient-background {
+  @apply bg-radial-[at_85%_15%] from-medium-gradient-light/40 via-light-gradient-light/50 to-background-light/20 to-90% dark:from-light-gradient-dark/40 dark:via-medium-gradient-dark/50 dark:to-background-dark/20;
+} */
+
+/* .nav-main {
+  @apply ;
+} */
+
+/* .nav-main__logo {
+  @apply ;
+} */
+
+/* .nav-main__list {
+  @apply 
+} */
+
+/* .nav-main__tool {
+  @apply ;
+} */
+
+/* .nav-main__ornament-wind {
+  @apply absolute right-10 h-auto w-48 text-primary-light/30 dark:text-primary-dark/30;
+} */
+
+/* .nav-main__item {
+  @apply;
+} */
+
+/* .nav-backdrop {
+  @apply ;
+} */
+
+/* .nav-dropdown-dekstop {
+  @apply ;
+} */
+
+/* .nav-dropdown-dekstop__list {
+  @apply ;
+} */
+
+/* .nav-dropdown-deksop__backdrop-pattern {
+  @apply absolute right-0 -bottom-10 h-64 w-64 text-secondary-light opacity-10 dark:text-secondary-dark;
+} */
+
+/* .nav-dropdown-dekstop__item {
+  @apply ;
+} */
+
+.slide-out-dropdown-navbar {
+  @apply z-0 animate-hide-dropdown;
+}
+
+.slide-in-dropdown-navbar {
+  @apply z-10 animate-show-dropdown;
+}
+
+.hide-dropdown-navbar {
+  @apply hidden;
+}
+
+/* .nav-dropdown-dekstop__caption {
+  @apply ;
+} */
+
+/* .nav-dropdown-dekstop__title {
+  @apply ;
+} */
+
+/* .nav-dropdown-dekstop__desc {
+  @apply ;
+} */
+
+/*===== Navbar Main Tool =====*/
+/* .nav-main__theme-switcher {
+  @apply ;
+} */
+
+/*===== Mobile Dropdown =====*/
+
+/* .nav-main__mobile-btn {
+  @apply ;
+} */
+
+/* .nav-dropdown-mobile {
+  @apply ;
+} */
+
+/* .nav-dropdown-mobile__backdrop-pattern {
+  @apply absolute top-0 right-0 h-32 w-32;
+} */
+
+/* .nav-dropdown-mobile__content {
+  @apply ;
+} */
+
+/* .nav-dropdown-mobile__list {
+  @apply ;
+} */
+
+/* .nav-dropdown-mobile__item {
+  @apply ;
+} */
+
+/* .nav-dropdown-mobile__tool {
+  @apply ;
+} */
+
+/* .nav-dropdown-mobile__theme-switcher {
+  @apply swap scale-75 swap-rotate;
+} */
+
+/* .nav-dropdown-mobile__division {
+  @apply ;
+} */
+
+/* .nav-dropdown-mobile__close-dropdown {
+  @apply ;
+} */
+
+/*old*/
+/* .mobile-dropdown-navbar-content-list {
+  @apply flex w-full flex-col gap-1;
+} */
+
+/*old*/
+/* .mobile-dropdown-navbar-content-list-submenu-header {
+  @apply z-10 flex w-full cursor-pointer flex-row justify-between gap-2 rounded-lg p-2 hover:bg-background-light hover:dark:bg-background-dark;
+} */
+
+/*old*/
+/* .mobile-dropdown-navbar-content-list-submenu-content {
+  @apply flex flex-col gap-1 overflow-hidden px-2;
+} */
+
+/*old*/
+/* .mobile-dropdown-navbar-content-list-submenu-content-item {
+  @apply rounded-lg py-2 pl-2 hover:bg-background-light hover:dark:bg-background-dark;
+} */

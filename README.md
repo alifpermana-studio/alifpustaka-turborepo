@@ -1,135 +1,187 @@
-# Turborepo starter
+# 📦 Creating and Using Shared Packages in Turborepo (pnpm)
 
-This Turborepo starter is maintained by the Turborepo core team.
+This guide outlines the standardized process for creating a shared package within the monorepo's `packages/` directory and consuming it in an application. We will use **`@repo/example-config`** as a placeholder name.
 
-## Using this example
+## 1\. Package Creation and Initialization 🛠️
 
-Run the following command:
+1.  **Create the Directory:** Navigate to the `packages` directory and create the new package folder.
 
-```sh
-npx create-turbo@latest
-```
+    ```bash
+    cd packages
+    mkdir example-config
+    cd example-config
+    ```
 
-## What's inside?
+2.  **Initialize `package.json`:**
 
-This Turborepo includes the following packages/apps:
+    ```bash
+    pnpm init
+    ```
 
-### Apps and Packages
+3.  **Configure `package.json`:** Edit the file to define the workspace name, entry points, and scripts.
+    - **Name:** Use the standard monorepo naming convention (e.g., `"@repo/example-config"`).
+    - **Entry Points:** Point to the **compiled output** (`dist`).
+    - **Scripts:** Define the `build` script using `tsc`.
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+    <!-- end list -->
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+    ```json
+    // packages/example-config/package.json
+    {
+      "name": "@repo/example-config",
+      "version": "1.0.0",
+      "main": "dist/index.js",   <-- Points to compiled JS
+      "types": "dist/index.d.ts", <-- Points to compiled types
+      "scripts": {
+        "build": "tsc"          <-- Runs the TypeScript compiler
+      },
+      "devDependencies": {
+        "typescript": "^5.x.x",
+        "@repo/typescript-config": "workspace:*" // Inherit from your shared config
+      }
+    }
+    ```
 
-### Utilities
+4.  **Install Dependencies:** Run install inside the new package directory.
 
-This Turborepo has some additional tools already setup for you:
+    ```bash
+    pnpm install
+    ```
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+---
 
-### Build
+## 2\. TypeScript and Source Setup ⚙️
 
-To build all apps and packages, run the following command:
+1.  **Create `tsconfig.json`:** Inherit from your base config and define the input (`src`) and output (`dist`).
 
-```
-cd my-turborepo
+    ```json
+    // packages/example-config/tsconfig.json
+    {
+      "extends": "@repo/typescript-config/base.json",
+      "include": ["src/**/*.ts"],
+      "compilerOptions": {
+        "outDir": "dist",
+        "rootDir": "src"
+      }
+    }
+    ```
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
+2.  **Create Source File:** Create the source directory and the entry point file. This is the code that will be shared.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
+    ```bash
+    mkdir src
+    touch src/index.ts
+    ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+3.  **Handle Node Environment Types (🚨 Pitfall 1):**
+    If your package code uses Node.js global variables like `process.env` (as in the Prisma client singleton), you must install the types for TypeScript to recognize them.
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+    ```bash
+    pnpm install -D @types/node
+    ```
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+---
 
-### Develop
+## 3\. Package Consumption 🚀
 
-To develop all apps and packages, run the following command:
+1.  **Add Dependency to App:** In the consuming application (e.g., `apps/web/package.json`), add the new package using the pnpm workspace protocol.
 
-```
-cd my-turborepo
+    ```json
+    // apps/web/package.json
+    {
+      "dependencies": {
+        "@repo/example-config": "workspace:*"
+        // ...
+      }
+    }
+    ```
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+2.  **Crucial: Re-link Dependencies (🚨 Pitfall 2):**
+    Whenever a new dependency is added, you **must** run `pnpm install` from the **monorepo root** to update the symlinks for the entire workspace.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+    ```bash
+    # Run from the monorepo root
+    pnpm install
+    ```
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+3.  **Build the Shared Package (🚨 Pitfall 3):**
+    The app cannot import the package until it has been compiled into JavaScript. If you see **"Cannot find module..."**, the package hasn't been built or linked.
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+    ```bash
+    # Build the package once
+    pnpm --filter @repo/example-config build
+    ```
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+    _Hint: Ensure your `turbo.json` handles this automatically by using `"dependsOn": ["^build"]` for your app's build/dev script._
 
-### Remote Caching
+4.  **Import and Use:** You can now safely import the package in your application code.
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+    ```typescript
+    import { someExport } from "@repo/example-config";
+    ```
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+---
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+## 4\. Essential pnpm Commands in Turborepo 💻
 
-```
-cd my-turborepo
+These commands are executed from the **root directory** of your monorepo.
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
+### 1. Installation and Linking 🔗
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
+These commands manage dependencies and the workspace structure.
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+| Command                                                 | Purpose                                                                             | Notes                                                                       |
+| :------------------------------------------------------ | :---------------------------------------------------------------------------------- | :-------------------------------------------------------------------------- |
+| `pnpm install`                                          | **Installs all dependencies** for all packages and links them within the workspace. | **MUST RUN** this after changing _any_ `package.json` file in the monorepo. |
+| `pnpm add <package-name>`                               | Installs a new package as a dependency in the root directory.                       | Use this for tools like ESLint/TypeScript that are globally shared.         |
+| `pnpm add <package-name> --filter <app-or-pkg-name>`    | Installs a new external package into a **specific app or package**.                 | Example: `pnpm add axios --filter web`                                      |
+| `pnpm remove <package-name> --filter <app-or-pkg-name>` | Removes an external package from a specific project.                                |                                                                             |
+| `pnpm upgrade --latest`                                 | Updates all packages in the monorepo to the latest version.                         | This can be slow; use with caution.                                         |
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+---
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
+### 2. Running Scripts (Filtering) ⚙️
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
+This is the most common use of `pnpm` in a Turborepo—executing a script (like `dev` or `build`) on a specific package or group of packages using the `--filter` flag.
 
-## Useful Links
+| Command                                       | Purpose                                                                          | Turborepo Context                                        |
+| :-------------------------------------------- | :------------------------------------------------------------------------------- | :------------------------------------------------------- |
+| `pnpm <script-name> --filter <pkg-name>`      | **Runs a script** defined in a specific package's `package.json`.                | Example: `pnpm dev --filter web`                         |
+| `pnpm <script-name> --filter "./apps/*"`      | Runs the script on **all packages** within the `apps` directory.                 | Useful for running `test` across all frontend apps.      |
+| `pnpm <script-name> --filter "<pkg-name>..."` | Runs the script on the specified package **and all packages that depend on it.** | Example: `pnpm build --filter "ui..."`                   |
+| `pnpm <script-name> --filter "...<pkg-name>"` | Runs the script on the specified package **and all packages it depends on.**     | Rarely used, but helpful for deep dependency checks.     |
+| `pnpm run <script-name>`                      | Executes a script defined in the **root** `package.json`.                        | Example: `pnpm run clean` (for a global cleanup script). |
 
-Learn more about the power of Turborepo:
+> **Note:** For parallel tasks like `build` or `dev`, it's often more efficient and powerful to use the **Turborepo CLI** directly (e.g., `turbo run build --filter=web`) as it leverages caching and parallelization better than `pnpm` alone.
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+---
+
+### 3. Shared Package Management (Your `prisma-config` Case) 📦
+
+These commands are specific to managing your shared packages like `@repo/prisma-config`.
+
+| Command                                                 | Purpose                                                                     | Example                                                                                                     |
+| :------------------------------------------------------ | :-------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------- |
+| `pnpm build --filter <pkg-name>`                        | **Compiles a shared package** to create its `dist` output.                  | `pnpm build --filter prisma-config`                                                                         |
+| `pnpm db:generate --filter <pkg-name>`                  | **Runs the Prisma Client generation** script on the shared package.         | `pnpm db:generate --filter prisma-config`                                                                   |
+| `pnpm add @repo/package-a@workspace:* --filter <app-b>` | **Adds a shared workspace package** as a dependency to another app/package. | This should ideally be done by manually editing `package.json` and then running `pnpm install` at the root. |
+
+---
+
+### 4. General Workspace Tools 🛠️
+
+| Command                         | Purpose                                                  | Notes                                                             |
+| :------------------------------ | :------------------------------------------------------- | :---------------------------------------------------------------- |
+| `pnpm recursive exec <command>` | Executes a shell command in every package directory.     | Use with caution, often better replaced by `pnpm run --filter`.   |
+| `pnpm why <package-name>`       | Shows the dependency tree of why a package is installed. | Excellent for debugging unexpected packages or version conflicts. |
+
+---
+
+## Common Pitfalls and Solutions You Encountered
+
+| Pitfall / Error                                            | Cause                                                                                                                                                                              | Solution                                                                                                                                                                  |
+| :--------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **`"None of the selected packages has a 'build' script"`** | The `package.json` file in the shared package is missing the `"build": "tsc"` line in the `scripts` section.                                                                       | **Add the script:** Ensure `packages/example-config/package.json` contains `"build": "tsc"`.                                                                              |
+| **`"Cannot find name 'process'..."`**                      | The package uses global Node.js variables (`process`, `globalThis`) but lacks the corresponding TypeScript type definitions.                                                       | **Install types:** Run `pnpm install -D @types/node` in the shared package.                                                                                               |
+| **`"Cannot find module '@repo/example-config'..."`**       | **MOST COMMON ISSUE:** The module cannot be resolved because the package was never built, or pnpm failed to create the symlink to the package's compiled output (`dist/index.js`). | **1. Build:** Run `pnpm --filter @repo/example-config build`. **2. Link:** Run `pnpm install` from the monorepo root. **3. Restart:** Restart your editor and dev server. |
+| **`"main": "src/index.ts"`**                               | Incorrectly pointing the entry point to a TypeScript source file instead of the compiled output.                                                                                   | **Correct `package.json`:** Set `"main": "dist/index.js"` and `"types": "dist/index.d.ts"`.                                                                               |

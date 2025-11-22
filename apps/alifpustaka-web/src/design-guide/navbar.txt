@@ -1,0 +1,35 @@
+NAVBAR
+|
+|---> dropdown-background lg hidden/visible == NAV-BACKDROP
+|
+|---> navbar-menu == NAV-CONTAINER
+|     |---> main-navbar == NAV-MAIN
+|     |     |---> navbar-logo == NAV-MAIN__LOGO
+|     |     |---> main-menu-navbar == NAV-MAIN__LIST
+|     |     |     |---> menu-item-navbar == NAV-MAIN__ITEM
+|     |     |
+|     |     |---> mobile-hamburger-navbar-btn == NAV-MAIN__MOBILE-BTN
+|     |     |
+|     |     |---> menu-tool-navbar == NAV-MAIN__TOOL
+|     |           |---> swap scale-75 swap-rotate (Theme Switcher) == NAV-MAIN_THEME-SWITCHER
+|     |
+|     |---> dropdown-navbar == NAV-DROPDOWN-DEKSTOP
+|     |     |---> dropdown-dekstop-submenu-list == NAV-DROPDOWN-DEKSTOP__LIST
+|     |           |---> absolute right-0 -bottom-10 h-64 w-64 text-secondary-light opacity-10 dark:text-secondary-dark == NAV-DROPDOWN-DEKSTOP__BACKDROP-PATTERN
+|     |           |---> dropdown-dekstop-submenu-content == NAV-DROPDOWN__ITEM
+|     |                 |---> rounded-lg == NAV-DROPDOWN-DEKSTOP__ICON
+|     |                 |---> dropdown-item-caption basis-3/4 == NAV-DROPDOWN-DEKSTOP__CAPTION 
+|     |                       |---> items-center transition-all duration-500 ease-in-out == NAV-DROPDOWN-DEKSTOP__TITLE
+|     |                       |---> text-xs transition-all duration-500 ease-in-out == NAV-DROPDOWN-DEKSTOP__DESC
+|     |
+|     |---> mobile-dropdown-navbar == NAV-DROPDOWN-MOBILE
+|           |---> mobile-dropdown-navbar-content == NAV-DROPDOWN-MOBILE__CONTENT
+|                 |---> NAV-DROPDOWN-MOBILE__LIST
+|                 |     |---> collapse-arrow collapse rounded-lg == NAV-DROPDOWN-MOBILE__ITEM
+|                 |
+|                 |---> NAV-DROPDOWN-MOBILE__TOOL
+|                 |     |---> swap scale-75 swap-rotate (Theme Switcher) == NAV-DROPDOWN-MOBILE__THEME-SWITCHER
+|                 |
+|                 |---> my-2 w-full border-2 border-background-light dark:border-background-dark == NAV-DROPDOWN-MOBILE__DIVISION
+|                 |---> flex w-full justify-center gap-2 == NAV-DROPDOWN-MOBILE__CLOSE-DROPDOWN
+ 

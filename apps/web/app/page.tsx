@@ -1,6 +1,7 @@
 import Image, { type ImageProps } from "next/image";
 import { Button } from "@repo/ui/button";
 import styles from "./page.module.css";
+import { Test } from "./components/Test";
 
 type Props = Omit<ImageProps, "src"> & {
   srcLight: string;
@@ -66,6 +67,7 @@ export default async function Home() {
         <Button appName="web" className={styles.secondary}>
           Open alert
         </Button>
+        <Test />
       </main>
       <footer className={styles.footer}>
         <a

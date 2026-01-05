@@ -1,9 +1,9 @@
 import { prisma } from "@repo/prisma-config";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
-    const user = await prisma.user.findUnique({ where: { id: "" } });
+    const user = await prisma.user.findMany();
 
     console.log("Check user: ", user);
 
@@ -14,6 +14,7 @@ export async function POST(req: NextRequest) {
       error: null,
     });
   } catch (error) {
+    console.error(error);
     return NextResponse.json({
       success: false,
       message: "Failed",
